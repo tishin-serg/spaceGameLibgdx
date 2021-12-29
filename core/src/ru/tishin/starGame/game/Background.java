@@ -1,19 +1,22 @@
-package ru.tishin.game;
+package ru.tishin.starGame.game;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import ru.tishin.starGame.StarGame;
+import ru.tishin.starGame.screen.ScreenManager;
 
 public class Background {
     private final int STAR_COUNT = 1000;
     private Texture textureSpace;
     private Texture textureStar;
     private Star[] stars;
-    private MyGdxGame game;
+    private StarGame game;
+    private GameController controller;
 
-    public Background(MyGdxGame game) {
-        this.game = game;
+    public Background(GameController controller) {
+        this.controller = controller;
         this.textureSpace = new Texture("bg.jpeg");
         this.textureStar = new Texture("star16.png");
         this.stars = new Star[STAR_COUNT];
@@ -49,15 +52,15 @@ public class Background {
         float scale;
 
         public Star() {
-            this.position = new Vector2(MathUtils.random(-200, ScreenManager.SCREEN_WIDTH + 200), MathUtils.random(-200,
-                    ScreenManager.SCREEN_HEIGHT + 200));
+            this.position = new Vector2(MathUtils.random(-200, ScreenManager.SCREEN_WIDTH + 200),
+                    MathUtils.random(-200, ScreenManager.SCREEN_HEIGHT + 200));
             this.velocity = new Vector2(MathUtils.random(-40, -5), 0);
             this.scale = Math.abs(velocity.x) / 40f; // размер зависит от скорости
         }
 
         public void update(float dt) {
-            position.x += (velocity.x - game.getHero().getLastDisplacement().x) * dt;
-            position.y += (velocity.y - game.getHero().getLastDisplacement().y) * dt;
+            position.x += (velocity.x - controller.getHero().getVelocity().x * 0.1) * dt;
+            position.y += (velocity.y - controller.getHero().getVelocity().y * 0.1) * dt;
             if (position.x < -200) {
                 position.x = ScreenManager.SCREEN_WIDTH + 200;
                 position.y = MathUtils.random(-200, ScreenManager.SCREEN_HEIGHT + 200);

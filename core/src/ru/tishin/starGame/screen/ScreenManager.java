@@ -1,4 +1,4 @@
-package ru.tishin.game;
+package ru.tishin.starGame.screen;
 
 public class ScreenManager {
     public static final int SCREEN_WIDTH = 1280;
