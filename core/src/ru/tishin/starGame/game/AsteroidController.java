@@ -1,9 +1,7 @@
 package ru.tishin.starGame.game;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import ru.tishin.starGame.game.helpers.ObjectPool;
-import ru.tishin.starGame.screen.ScreenManager;
 
 public class AsteroidController extends ObjectPool<Asteroid> {
     private GameController gameController;

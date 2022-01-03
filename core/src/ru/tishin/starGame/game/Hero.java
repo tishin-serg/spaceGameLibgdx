@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ru.tishin.starGame.screen.ScreenManager;
@@ -12,15 +13,19 @@ import ru.tishin.starGame.screen.utils.Assets;
 public class Hero {
     private final float SPEED = 500f;
     private final float RELOAD = 0.2f;
+    private final int HP_MAX = 50;
     private GameController gameController;
     private TextureRegion texture;
     private Vector2 position;
     private Vector2 velocity;
     private Vector2 direction;
+    private Circle hitArea;
     private float angle;
     private float fireTimer;
     private int score;
     private int scoreView;
+    private int hp;
+    private boolean isLive;
 
     public Hero(GameController gameController) {
         this.gameController = gameController;
@@ -29,10 +34,17 @@ public class Hero {
         this.velocity = new Vector2(0, 0);
         this.angle = 0.0f;
         this.direction = new Vector2(0, 0);
+        this.hitArea = new Circle(0, 0, 0);
+        this.hp = HP_MAX;
+        this.isLive = true;
     }
 
     public int getScore() {
         return score;
+    }
+
+    public int getHp() {
+        return hp;
     }
 
     public int getScoreView() {
@@ -51,18 +63,35 @@ public class Hero {
         return direction;
     }
 
+    public Circle getHitArea() {
+        return hitArea;
+    }
+
     public void changeScore(int delta) {
         score += delta;
     }
 
     public void render(SpriteBatch spriteBatch) {
-        spriteBatch.draw(texture, position.x - 32, position.y - 32, 32, 32, 64, 64,
-                1, 1, angle);
+        if (isLive) {
+            spriteBatch.draw(texture, position.x - 32, position.y - 32, 32, 32, 64, 64,
+                    1, 1, angle);
+        }
+    }
+
+    public boolean takeDamage(int amount) {
+        hp -= amount;
+        if (hp <= 0) {
+            isLive = false;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void update(float dt) {
         // С каждым кадром прибавляем к таймеру дельту времени.
         fireTimer += dt;
+        hitArea.setPosition(position);
 
         if (score > scoreView) {
             scoreView += 1000 * dt;

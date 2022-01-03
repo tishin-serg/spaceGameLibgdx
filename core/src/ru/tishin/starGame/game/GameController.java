@@ -71,6 +71,19 @@ public class GameController {
                 }
             }
         }
+
+        for (int i = 0; i < asteroidList.size(); i++) {
+            Asteroid asteroid = asteroidList.get(i);
+            if (asteroid.getHitArea().overlaps(hero.getHitArea())) {
+                hero.takeDamage(asteroid.getHpMax() / 2);
+                asteroid.takeDamage(asteroid.getHpMax() / 2);
+                hero.getVelocity().x *= -1f;
+                hero.getVelocity().y *= -1f;
+                asteroid.getVelocity().x *= -1.5f;
+                asteroid.getVelocity().y *= -1.5f;
+                break;
+            }
+        }
     }
 
     /*public void checkSightDirection() {

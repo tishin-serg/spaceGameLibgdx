@@ -37,6 +37,9 @@ public class WorldRenderer {
         stringBuilder.clear();
         stringBuilder.append("SCORE: ").append(controller.getHero().getScoreView());
         font32.draw(batch, stringBuilder, 50, ScreenManager.SCREEN_HEIGHT - 50);
+        stringBuilder.clear();
+        stringBuilder.append("HP: ").append(controller.getHero().getHp());
+        font32.draw(batch, stringBuilder, 50, ScreenManager.SCREEN_HEIGHT - 100);
         batch.end();
     }
 }

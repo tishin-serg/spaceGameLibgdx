@@ -34,6 +34,10 @@ public class Asteroid implements Poolable {
         this.active = false;
     }
 
+    public Vector2 getVelocity() {
+        return velocity;
+    }
+
     public Vector2 getPosition() {
         return position;
     }
