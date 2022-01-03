@@ -2,13 +2,15 @@ package ru.tishin.starGame.game;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ru.tishin.starGame.game.helpers.ObjectPool;
+import ru.tishin.starGame.screen.utils.Assets;
 
 public class BulletController extends ObjectPool<Bullet> {
-    private Texture texture;
+    private TextureRegion texture;
 
     public BulletController() {
-        this.texture = new Texture("bullet.png");
+        this.texture = Assets.getInstance().getAtlas().findRegion("bullet");
     }
 
     public void render(SpriteBatch batch) {
