@@ -1,6 +1,5 @@
 package ru.tishin.starGame.game;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ru.tishin.starGame.game.helpers.ObjectPool;
@@ -8,9 +7,11 @@ import ru.tishin.starGame.screen.utils.Assets;
 
 public class BulletController extends ObjectPool<Bullet> {
     private TextureRegion texture;
+    private GameController gameController;
 
-    public BulletController() {
+    public BulletController(GameController gameController) {
         this.texture = Assets.getInstance().getAtlas().findRegion("bullet");
+        this.gameController = gameController;
     }
 
     public void render(SpriteBatch batch) {
@@ -36,6 +37,6 @@ public class BulletController extends ObjectPool<Bullet> {
 
     @Override
     protected Bullet newObject() {
-        return new Bullet();
+        return new Bullet(gameController);
     }
 }

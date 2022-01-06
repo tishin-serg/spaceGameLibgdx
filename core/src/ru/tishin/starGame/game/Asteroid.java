@@ -119,6 +119,9 @@ public class Asteroid implements Poolable {
 
     public void deactivate() {
         active = false;
+        if (MathUtils.randomBoolean(0.1f)) {
+            gameController.getBonusController().setup(position.x, position.y);
+        }
     }
 
     @Override

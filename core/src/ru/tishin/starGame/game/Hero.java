@@ -2,30 +2,51 @@ package ru.tishin.starGame.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.StringBuilder;
 import ru.tishin.starGame.screen.ScreenManager;
 import ru.tishin.starGame.screen.utils.Assets;
 
 public class Hero {
     private final float SPEED = 500f;
     private final float RELOAD = 0.2f;
-    private final int HP_MAX = 50;
     private GameController gameController;
     private TextureRegion texture;
     private Vector2 position;
     private Vector2 velocity;
     private Vector2 direction;
     private Circle hitArea;
+    private Weapon currentWeapon;
+    private StringBuilder stringBuilder;
     private float angle;
     private float fireTimer;
     private int score;
     private int scoreView;
     private int hp;
+    private int hpMax;
     private boolean isLive;
+    private int coins;
+
+    /*
+    Герой уничтожает астероид, на месте астероида с какой-то вероятностью появляется бонус. Т.е. объект из пула становится
+    активным.
+    Параметры бонуса генерируется в момент возникновения? или в момент поднятия героем? Они точно должны генерится в ините()
+
+    У бонуса есть енам перечисление, по типу бонуса. Аптечка, боезапас, монеты.
+    Чтобы поднять бонус, нужно оверлапсить хит ареи двух объектов.
+
+    Как только произошло поднятие бонуса, то в середине экрана появляется надпись с названием бонуса.
+    Объект бонуса переводится в неактивное состояние.
+
+    Герою начисляются плюшки.
+     */
+
 
     public Hero(GameController gameController) {
         this.gameController = gameController;
@@ -34,9 +55,22 @@ public class Hero {
         this.velocity = new Vector2(0, 0);
         this.angle = 0.0f;
         this.direction = new Vector2(0, 0);
-        this.hitArea = new Circle(0, 0, 0);
-        this.hp = HP_MAX;
+        this.hitArea = new Circle(position, 20);
+        this.hpMax = 100;
+        this.hp = hpMax;
         this.isLive = true;
+        this.stringBuilder = new StringBuilder();
+        this.coins = 0;
+        this.currentWeapon = new Weapon(gameController, this, "Laser", 0, 1, 600f, 300, 0.2f,
+                new Vector3[] {
+                     new Vector3(28, 0, 0),
+                     new Vector3(28, 90, 20),
+                     new Vector3(28, -90, -20),
+                });
+    }
+
+    public int getHpMax() {
+        return hpMax;
     }
 
     public int getScore() {
@@ -88,70 +122,109 @@ public class Hero {
         }
     }
 
+    public void takeHpBonus(int hp) {
+        this.hp += hp;
+        if (this.hp > hpMax) this.hp = hpMax;
+    }
+
     public void update(float dt) {
-        // С каждым кадром прибавляем к таймеру дельту времени.
-        fireTimer += dt;
-        hitArea.setPosition(position);
 
-        if (score > scoreView) {
-            scoreView += 1000 * dt;
-            if (scoreView > score) {
-                scoreView = score;
-            }
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            if (fireTimer > RELOAD) {
-                fireTimer = 0;
-                float wx = position.x + MathUtils.cosDeg(angle + 90) * 20;
-                float wy = position.y + MathUtils.sinDeg(angle + 90) * 20;
-                gameController.getBulletController().setup(wx, wy,
-                        MathUtils.cosDeg(angle) * 500f + velocity.x,
-                        MathUtils.sinDeg(angle) * 500f + velocity.y);
-                wx = position.x + MathUtils.cosDeg(angle - 90) * 20;
-                wy = position.y + MathUtils.sinDeg(angle - 90) * 20;
-                gameController.getBulletController().setup(wx, wy,
-                        MathUtils.cosDeg(angle) * 500f + velocity.x,
-                        MathUtils.sinDeg(angle) * 500f + velocity.y);
-            }
-        }
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            angle += 180.0f * dt;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            angle -= 180.0f * dt;
-        }
-        /*
-        Пока нажимаем W, увеличивается ускорение.
-         */
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-//            velocity.x += MathUtils.cosDeg(angle) * SPEED * dt;
-//            velocity.y += MathUtils.sinDeg(angle) * SPEED * dt;
-            velocity.add(MathUtils.cosDeg(angle) * SPEED * dt, MathUtils.sinDeg(angle) * SPEED * dt);
-        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-//            velocity.x += MathUtils.cosDeg(angle) * (-SPEED / 2) * dt;
-//            velocity.y += MathUtils.sinDeg(angle) * (-SPEED / 2) * dt;
-            velocity.add(MathUtils.cosDeg(angle) * (-SPEED / 2) * dt, MathUtils.sinDeg(angle) * (-SPEED / 2) * dt);
-        }
-//        position.x += velocity.x * dt;
-//        position.y += velocity.y * dt;
+        currentWeapon.update(dt);
+        checkHeroScore(dt);
+        checkPressedKeys(dt);
 
         /*
         Меняем позицию корабля. Прибавляем к вектору позиции объекта вектор ускорения.
         Умножаем на скаляр (чтобы скорость не зависела от частоты фпс).
          */
         position.mulAdd(velocity, dt);
+        hitArea.setPosition(position);
+        direction.set(MathUtils.cosDeg(angle), MathUtils.sinDeg(angle));
 
-        // Замедление скорости
+        slowingDown(dt);
+        checkGameBounds();
+    }
+
+    private void checkPressedKeys(float dt) {
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            shooting();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            angle += 180.0f * dt;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            angle -= 180.0f * dt;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            velocity.add(MathUtils.cosDeg(angle) * SPEED * dt, MathUtils.sinDeg(angle) * SPEED * dt);
+            float bx = position.x + MathUtils.cosDeg(angle + 180) * 30;
+            float by = position.y + MathUtils.sinDeg(angle + 180) * 30;
+            for (int i = 0; i < 3; i++) {
+                gameController.getParticleController().setup(bx + MathUtils.random(-4, 4), by + MathUtils.random(-4, 4),
+                        velocity.x * -0.1f + MathUtils.random(-20, 20), velocity.y * -0.1f + MathUtils.random(-20, 20),
+                        0.3f, 1.2f, 0.2f,
+                        1.0f, 0.5f, 0, 1,
+                        1, 1, 1, 0);
+            }
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            velocity.add(MathUtils.cosDeg(angle) * (-SPEED / 2) * dt, MathUtils.sinDeg(angle) * (-SPEED / 2) * dt);
+            float bx = position.x + MathUtils.cosDeg(angle + 90) * -25;
+            float by = position.y + MathUtils.sinDeg(angle + 90) * -25;
+            for (int i = 0; i < 2; i++) {
+                gameController.getParticleController().setup(bx + MathUtils.random(-4, 4), by + MathUtils.random(-4, 4),
+                        velocity.x * 0.1f + MathUtils.random(-20, 20), velocity.y * 0.1f + MathUtils.random(-20, 20),
+                        0.3f, 1.2f, 0.2f,
+                        1f, 0.5f, 0f, 1f,
+                        1f, 1f, 1f, 0);
+            }
+            bx = position.x + MathUtils.cosDeg(angle - 90) * -25;
+            by = position.y + MathUtils.sinDeg(angle - 90) * -25;
+            for (int i = 0; i < 2; i++) {
+                gameController.getParticleController().setup(bx + MathUtils.random(-4, 4), by + MathUtils.random(-4, 4),
+                        velocity.x * 0.1f + MathUtils.random(-20, 20), velocity.y * 0.1f + MathUtils.random(-20, 20),
+                        0.3f, 1.2f, 0.2f,
+                        1f, 0.5f, 0f, 1f,
+                        1f, 1f, 1f, 0);
+            }
+        }
+    }
+
+    private void checkHeroScore(float dt) {
+        if (score > scoreView) {
+            scoreView += 1000 * dt;
+            if (scoreView > score) {
+                scoreView = score;
+            }
+        }
+    }
+
+    public void shooting() {
+            currentWeapon.fire();
+
+//        if (fireTimer > RELOAD) {
+//            fireTimer = 0;
+//            float wx = position.x + MathUtils.cosDeg(angle + 90) * 20;
+//            float wy = position.y + MathUtils.sinDeg(angle + 90) * 20;
+//            gameController.getBulletController().setup(wx, wy,
+//                    MathUtils.cosDeg(angle) * 500f + velocity.x,
+//                    MathUtils.sinDeg(angle) * 500f + velocity.y);
+//            wx = position.x + MathUtils.cosDeg(angle - 90) * 20;
+//            wy = position.y + MathUtils.sinDeg(angle - 90) * 20;
+//            gameController.getBulletController().setup(wx, wy,
+//                    MathUtils.cosDeg(angle) * 500f + velocity.x,
+//                    MathUtils.sinDeg(angle) * 500f + velocity.y);
+//        }
+    }
+
+    public void slowingDown(float dt) {
         float stopCf = 1.0f - 1.0f * dt;
         if (stopCf < 0.0f) {
             stopCf = 0.0f;
         }
         velocity.scl(stopCf);
+    }
 
-        direction.set(MathUtils.cosDeg(angle), MathUtils.sinDeg(angle));
-
+    public void checkGameBounds() {
         if (position.x < 32) {
             position.x = 32;
             velocity.x *= -0.5f;
@@ -170,5 +243,24 @@ public class Hero {
         }
     }
 
+    public void renderGUI(SpriteBatch batch, BitmapFont font32) {
+        stringBuilder.clear();
+        stringBuilder.append("SCORE: ").append(getScoreView()).append("\n");
+        stringBuilder.append("HP: ").append(hp).append(" / ").append(hpMax).append("\n");
+        stringBuilder.append("AMMO: ").append(currentWeapon.getBulletCountCurrent()).append(" / ").append(currentWeapon.getBulletCountMax()).append("\n");
+        stringBuilder.append("COINS: ").append(coins);
+        font32.draw(batch, stringBuilder, 50, ScreenManager.SCREEN_HEIGHT - 50);
+    }
 
+    public float getAngle() {
+        return angle;
+    }
+
+    public void takeBulletBonus(int value) {
+        currentWeapon.takeBulletBonus(value);
+    }
+
+    public void takeCoinsBonus(int value) {
+        coins += value;
+    }
 }
