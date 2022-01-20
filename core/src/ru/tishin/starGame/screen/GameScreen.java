@@ -6,12 +6,11 @@ import ru.tishin.starGame.game.WorldRenderer;
 import ru.tishin.starGame.screen.utils.Assets;
 
 public class GameScreen extends AbstractScreen{
-    private SpriteBatch batch;
     private GameController controller;
     private WorldRenderer renderer;
 
     public GameScreen(SpriteBatch batch) {
-        this.batch = batch;
+        super(batch);
     }
 
     @Override

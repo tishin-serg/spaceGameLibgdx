@@ -69,4 +69,8 @@ public class Weapon {
         bulletCountCurrent += value;
         if (bulletCountCurrent > bulletCountMax) bulletCountCurrent = bulletCountMax;
     }
+
+    public int getDamage() {
+        return damage;
+    }
 }

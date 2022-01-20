@@ -20,6 +20,17 @@ public class ParticleController extends ObjectPool<Particle> {
         return effectBuilder;
     }
 
+    public void takeBonusEffect(float x, float y) {
+        for (int i = 0; i < 16; i++) {
+            // равномерно распределяем круг на 16 частей
+            float angle = 6.28f / 16f * i;
+            setup(x, y, MathUtils.cos(angle) * 100, MathUtils.sin(angle) * 100,
+                    0.4f, 2f, 1f,
+                    0,1,0,1,
+                    1,1,0,0.5f);
+        }
+    }
+
     public void render(SpriteBatch batch) {
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         for (int i = 0; i < activeList.size(); i++) {

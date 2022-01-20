@@ -119,9 +119,6 @@ public class Asteroid implements Poolable {
 
     public void deactivate() {
         active = false;
-        if (MathUtils.randomBoolean(0.1f)) {
-            gameController.getBonusController().setup(position.x, position.y);
-        }
     }
 
     @Override
@@ -129,37 +126,7 @@ public class Asteroid implements Poolable {
         return active;
     }
 
-    /*
-    public void update(float dt) {
-        rotation += 100.f * dt;
-        velocity.x = MathUtils.cosDeg(direction) * 20000.0f * dt;
-        velocity.y = MathUtils.sinDeg(direction) * 20000.0f * dt;
-//        position.x += (velocity.x - controller.getHero().getVelocity().x) * dt;
-//        position.y += (velocity.y - controller.getHero().getVelocity().y) * dt;
-
-        if (position.x < -32) {
-            position.x = ScreenManager.SCREEN_WIDTH;
-            direction += MathUtils.random(165, 195);
-            System.out.println("лево");
-        }
-        if (position.y < -32) {
-            position.y = ScreenManager.SCREEN_HEIGHT;
-//            direction += MathUtils.random(255, 285);
-//            direction += MathUtils.random(75, 105);
-            System.out.println("низ");
-        }
-        if (position.x > ScreenManager.SCREEN_WIDTH + 32) {
-            position.x = 32;
-            System.out.println("право");
-            direction += MathUtils.random(-15, 15);
-        }
-        if (position.y > ScreenManager.SCREEN_HEIGHT + 32) {
-            position.y = 32;
-            System.out.println("верх");
-//            // direction += MathUtils.random(255, 285);
-//             direction += MathUtils.random(75, 105);
-        }
+    public float getScale() {
+        return scale;
     }
-
-     */
 }

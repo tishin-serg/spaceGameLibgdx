@@ -5,6 +5,8 @@ package ru.tishin.starGame.game;
 Этот клас хранит и даёт доступ ко всем игровым ресурсам.
  */
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import ru.tishin.starGame.screen.ScreenManager;
@@ -19,6 +21,7 @@ public class GameController {
     private Hero hero;
     private Vector2 tempVector;
     private ParticleController particleController;
+    private boolean isPause;
 
     public GameController() {
         this.background = new Background(this);
@@ -28,13 +31,23 @@ public class GameController {
         this.tempVector = new Vector2();
         this.particleController = new ParticleController();
         this.bonusController = new BonusController(this);
+        this.isPause = false;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             asteroidController.setup(MathUtils.random(0, ScreenManager.SCREEN_WIDTH),
                     MathUtils.random(0, ScreenManager.SCREEN_HEIGHT),
                     MathUtils.random(-200f, 200f),
                     MathUtils.random(-200f, 200f), 1.0f);
         }
+    }
+
+    public void pause() {
+        if (isPause) isPause = false;
+        else isPause = true;
+    }
+
+    public boolean isPause() {
+        return isPause;
     }
 
     public BonusController getBonusController() {
@@ -62,13 +75,18 @@ public class GameController {
     }
 
     public void update(float dt) {
-        background.update(dt);
-        hero.update(dt);
-        asteroidController.update(dt);
-        bulletController.update(dt);
-        particleController.update(dt);
-        bonusController.update(dt);
-        checkCollisions();
+
+
+        if (!isPause) {
+            background.update(dt);
+            hero.update(dt);
+            asteroidController.update(dt);
+            bulletController.update(dt);
+            particleController.update(dt);
+            bonusController.update(dt);
+            checkCollisions();
+        }
+
     }
 
     private void checkCollisions() {
@@ -100,29 +118,9 @@ public class GameController {
 
         for (int i = 0; i < bonusList.size(); i++) {
             Bonus bonus = bonusList.get(i);
-            Bonus.BonusType bonusType = bonus.getBonusType();
-            int value = bonusType.getValue();
             if (hero.getHitArea().overlaps(bonus.getHitArea())) {
-                switch (bonusType) {
-                    case HP:
-                        hero.takeHpBonus(value);
-                        System.out.println(value);
-                        bonus.deactivate();
-                        break;
-                    case BULLETS:
-                        hero.takeBulletBonus(value);
-                        System.out.println(value);
-                        bonus.deactivate();
-                        break;
-                    case COINS:
-                        hero.takeCoinsBonus(value);
-                        System.out.println(value);
-                        bonus.deactivate();
-                        break;
-                    default:
-                        bonus.deactivate();
-                        System.out.println("Бонус не найден");
-                }
+                hero.takeBonus(bonus);
+                particleController.takeBonusEffect(bonus.getPosition().x, bonus.getPosition().y);
             }
         }
 
@@ -142,8 +140,12 @@ public class GameController {
 
 
                     bullet.deactivate();
-                    if (asteroid.takeDamage(1)) {
+                    if (asteroid.takeDamage(hero.getCurrentWeapon().getDamage())) {
                         hero.changeScore(asteroid.getHpMax() * 100);
+                        for (int k = 0; k < 3; k++) {
+                            bonusController.setup(asteroid.getPosition().x, asteroid.getPosition().y,
+                                    asteroid.getScale() * 0.25f);
+                        }
                     }
                     break;
                 }

@@ -33,21 +33,6 @@ public class Hero {
     private boolean isLive;
     private int coins;
 
-    /*
-    Герой уничтожает астероид, на месте астероида с какой-то вероятностью появляется бонус. Т.е. объект из пула становится
-    активным.
-    Параметры бонуса генерируется в момент возникновения? или в момент поднятия героем? Они точно должны генерится в ините()
-
-    У бонуса есть енам перечисление, по типу бонуса. Аптечка, боезапас, монеты.
-    Чтобы поднять бонус, нужно оверлапсить хит ареи двух объектов.
-
-    Как только произошло поднятие бонуса, то в середине экрана появляется надпись с названием бонуса.
-    Объект бонуса переводится в неактивное состояние.
-
-    Герою начисляются плюшки.
-     */
-
-
     public Hero(GameController gameController) {
         this.gameController = gameController;
         this.texture = Assets.getInstance().getAtlas().findRegion("ship");
@@ -256,11 +241,29 @@ public class Hero {
         return angle;
     }
 
-    public void takeBulletBonus(int value) {
-        currentWeapon.takeBulletBonus(value);
+    public Weapon getCurrentWeapon() {
+        return currentWeapon;
     }
 
-    public void takeCoinsBonus(int value) {
-        coins += value;
+    public void takeBonus(Bonus bonus) {
+        Bonus.BonusType bonusType = bonus.getBonusType();
+        int value = bonus.getValue();
+        switch (bonusType) {
+            case HP:
+                hp += value;
+                bonus.deactivate();
+                break;
+            case AMMO:
+                currentWeapon.takeBulletBonus(value);
+                bonus.deactivate();
+                break;
+            case COINS:
+                coins += value;
+                bonus.deactivate();
+                break;
+            default:
+                bonus.deactivate();
+                System.out.println("Бонус не найден");
+        }
     }
 }
