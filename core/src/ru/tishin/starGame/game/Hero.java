@@ -16,6 +16,7 @@ import ru.tishin.starGame.screen.utils.Assets;
 public class Hero {
     private final float SPEED = 500f;
     private final float RELOAD = 0.2f;
+    private static int FINISH_SCORE;
     private GameController gameController;
     private TextureRegion texture;
     private Vector2 position;
@@ -47,10 +48,10 @@ public class Hero {
         this.stringBuilder = new StringBuilder();
         this.coins = 0;
         this.currentWeapon = new Weapon(gameController, this, "Laser", 0, 1, 600f, 300, 0.2f,
-                new Vector3[] {
-                     new Vector3(28, 0, 0),
-                     new Vector3(28, 90, 20),
-                     new Vector3(28, -90, -20),
+                new Vector3[]{
+                        new Vector3(28, 0, 0),
+                        new Vector3(28, 90, 20),
+                        new Vector3(28, -90, -20),
                 });
     }
 
@@ -99,12 +100,7 @@ public class Hero {
 
     public boolean takeDamage(int amount) {
         hp -= amount;
-        if (hp <= 0) {
-            isLive = false;
-            return true;
-        } else {
-            return false;
-        }
+        return !checkLive();
     }
 
     public void takeHpBonus(int hp) {
@@ -112,7 +108,20 @@ public class Hero {
         if (this.hp > hpMax) this.hp = hpMax;
     }
 
+    public boolean checkLive() {
+        if (hp <= 0) {
+            isLive = false;
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public void update(float dt) {
+        if (!isLive) {
+            gameController.saveScore(score);
+            ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME_OVER);
+        }
 
         currentWeapon.update(dt);
         checkHeroScore(dt);
@@ -184,21 +193,7 @@ public class Hero {
     }
 
     public void shooting() {
-            currentWeapon.fire();
-
-//        if (fireTimer > RELOAD) {
-//            fireTimer = 0;
-//            float wx = position.x + MathUtils.cosDeg(angle + 90) * 20;
-//            float wy = position.y + MathUtils.sinDeg(angle + 90) * 20;
-//            gameController.getBulletController().setup(wx, wy,
-//                    MathUtils.cosDeg(angle) * 500f + velocity.x,
-//                    MathUtils.sinDeg(angle) * 500f + velocity.y);
-//            wx = position.x + MathUtils.cosDeg(angle - 90) * 20;
-//            wy = position.y + MathUtils.sinDeg(angle - 90) * 20;
-//            gameController.getBulletController().setup(wx, wy,
-//                    MathUtils.cosDeg(angle) * 500f + velocity.x,
-//                    MathUtils.sinDeg(angle) * 500f + velocity.y);
-//        }
+        currentWeapon.fire();
     }
 
     public void slowingDown(float dt) {
@@ -250,7 +245,7 @@ public class Hero {
         int value = bonus.getValue();
         switch (bonusType) {
             case HP:
-                hp += value;
+                takeHpBonus(value);
                 bonus.deactivate();
                 break;
             case AMMO:

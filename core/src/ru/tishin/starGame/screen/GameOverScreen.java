@@ -9,27 +9,27 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.ScreenUtils;
-import ru.tishin.starGame.game.Background;
+import com.badlogic.gdx.utils.StringBuilder;
 import ru.tishin.starGame.screen.utils.Assets;
 
-public class MenuScreen extends AbstractScreen {
-    private Background background;
+public class GameOverScreen extends AbstractScreen {
     private BitmapFont font72;
-    private BitmapFont font24;
+    private BitmapFont font32;
     private Stage stage;
+    private StringBuilder stringBuilder;
+    private int finishScore;
 
-    public MenuScreen(SpriteBatch batch) {
+    public GameOverScreen(SpriteBatch batch) {
         super(batch);
     }
 
     @Override
     public void show() {
-        this.background = new Background(null);
         this.stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
         this.font72 = Assets.getInstance().getAssetManager().get("fonts/font72.ttf");
-        this.font24 = Assets.getInstance().getAssetManager().get("fonts/font24.ttf");
+        this.font32 = Assets.getInstance().getAssetManager().get("fonts/font32.ttf");
+        this.stringBuilder = new StringBuilder();
 
         Gdx.input.setInputProcessor(stage);
 
@@ -38,52 +38,42 @@ public class MenuScreen extends AbstractScreen {
 
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.up = skin.getDrawable("simpleButton");
-        textButtonStyle.font = font24;
+        textButtonStyle.font = font32;
         skin.add("simpleSkin", textButtonStyle);
 
-        Button btnNewGame = new TextButton("New Game", textButtonStyle);
-        Button btnExitGame = new TextButton("Exit Game", textButtonStyle);
-        btnNewGame.setPosition(480, 210);
-        btnExitGame.setPosition(480, 110);
+        Button btnMenu = new TextButton("Menu", textButtonStyle);
+        btnMenu.setPosition(480, 110);
 
-        btnNewGame.addListener(new ChangeListener() {
+        btnMenu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
+                ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
             }
         });
 
-        btnExitGame.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.exit();
-            }
-        });
-
-        stage.addActor(btnNewGame);
-        stage.addActor(btnExitGame);
+        stage.addActor(btnMenu);
         skin.dispose();
     }
 
     public void update(float dt) {
-        background.update(dt);
         stage.act(dt);
     }
 
     @Override
     public void render(float delta) {
+        stringBuilder.clear();
         update(delta);
         ScreenUtils.clear(0f, 0f, 0f, 1);
         batch.begin();
-        background.render(batch);
-        font72.draw(batch, "Star Game 2022", 0, 600, ScreenManager.SCREEN_WIDTH, 1, false);
+        font72.draw(batch, "GAME OVER", 0, 600, ScreenManager.SCREEN_WIDTH, 1, false);
+        stringBuilder.append("SCORE: ").append(finishScore);
+        font32.draw(batch, stringBuilder, 0, 500, ScreenManager.SCREEN_WIDTH, 1, false);
         batch.end();
         stage.draw();
     }
 
-    @Override
-    public void dispose() {
-        background.dispose();
-        stage.dispose();
+
+    public void saveFinishScore(int score) {
+        this.finishScore = score;
     }
 }

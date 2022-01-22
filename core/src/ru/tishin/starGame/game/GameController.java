@@ -75,7 +75,7 @@ public class GameController {
     }
 
     public void update(float dt) {
-
+        checkPressedKeys();
 
         if (!isPause) {
             background.update(dt);
@@ -87,6 +87,15 @@ public class GameController {
             checkCollisions();
         }
 
+    }
+
+    private void checkPressedKeys() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            pause();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.MENU);
+        }
     }
 
     private void checkCollisions() {
@@ -155,6 +164,13 @@ public class GameController {
 
     }
 
+    public void saveScore(int score) {
+        ScreenManager.getInstance().saveFinishScore(score);
+    }
+
+    public void dispose() {
+        background.dispose();
+    }
     /*public void checkSightDirection() {
         List<Asteroid> list = getAsteroidController().getActiveList();
         Vector2 hero = getHero().getPosition();

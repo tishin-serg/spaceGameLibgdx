@@ -14,7 +14,6 @@ public class Background {
     private Texture textureSpace;
     private TextureRegion textureStar;
     private Star[] stars;
-    private StarGame game;
     private GameController controller;
 
     public Background(GameController controller) {
@@ -45,6 +44,10 @@ public class Background {
         }
     }
 
+    public void dispose() {
+        textureSpace.dispose();
+    }
+
     private class Star {
         Vector2 position;
         Vector2 velocity;
@@ -58,8 +61,13 @@ public class Background {
         }
 
         public void update(float dt) {
-            position.x += (velocity.x - controller.getHero().getVelocity().x * 0.1) * dt;
-            position.y += (velocity.y - controller.getHero().getVelocity().y * 0.1) * dt;
+            if (controller != null) {
+                position.x += (velocity.x - controller.getHero().getVelocity().x * 0.1) * dt;
+                position.y += (velocity.y - controller.getHero().getVelocity().y * 0.1) * dt;
+            } else {
+                position.mulAdd(velocity, dt);
+            }
+
             if (position.x < -200) {
                 position.x = ScreenManager.SCREEN_WIDTH + 200;
                 position.y = MathUtils.random(-200, ScreenManager.SCREEN_HEIGHT + 200);

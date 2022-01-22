@@ -10,7 +10,7 @@ import ru.tishin.starGame.screen.utils.Assets;
 public class ScreenManager {
 
     public enum ScreenType {
-        GAME, MENU
+        GAME, MENU, GAME_OVER
     }
 
     public static final int SCREEN_WIDTH = 1280;
@@ -21,6 +21,7 @@ public class ScreenManager {
     private GameScreen gameScreen;
     private LoadingScreen loadingScreen;
     private MenuScreen menuScreen;
+    private GameOverScreen gameOverScreen;
     private Screen targetScreen;
     private Viewport viewport;
 
@@ -45,6 +46,11 @@ public class ScreenManager {
         this.gameScreen = new GameScreen(batch);
         this.loadingScreen = new LoadingScreen(batch);
         this.menuScreen = new MenuScreen(batch);
+        this.gameOverScreen = new GameOverScreen(batch);
+    }
+
+    public void saveFinishScore(int score) {
+        gameOverScreen.saveFinishScore(score);
     }
 
     public void resize(int width, int height) {
@@ -66,6 +72,10 @@ public class ScreenManager {
             case MENU:
                 targetScreen = menuScreen;
                 Assets.getInstance().loadAssets(ScreenType.MENU);
+                break;
+            case GAME_OVER:
+                targetScreen = gameOverScreen;
+                Assets.getInstance().loadAssets(ScreenType.GAME_OVER);
                 break;
         }
     }

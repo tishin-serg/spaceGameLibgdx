@@ -5,7 +5,7 @@ import ru.tishin.starGame.game.GameController;
 import ru.tishin.starGame.game.WorldRenderer;
 import ru.tishin.starGame.screen.utils.Assets;
 
-public class GameScreen extends AbstractScreen{
+public class GameScreen extends AbstractScreen {
     private GameController controller;
     private WorldRenderer renderer;
 
@@ -24,5 +24,10 @@ public class GameScreen extends AbstractScreen{
     public void render(float delta) {
         controller.update(delta);
         renderer.render();
+    }
+
+    @Override
+    public void dispose() {
+        controller.dispose();
     }
 }
