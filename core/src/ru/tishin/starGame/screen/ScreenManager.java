@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ru.tishin.starGame.StarGame;
+import ru.tishin.starGame.game.Hero;
 import ru.tishin.starGame.screen.utils.Assets;
 
 public class ScreenManager {
@@ -49,8 +50,12 @@ public class ScreenManager {
         this.gameOverScreen = new GameOverScreen(batch);
     }
 
-    public void saveFinishScore(int score) {
-        gameOverScreen.saveFinishScore(score);
+//    public void saveFinishScore(int score) {
+//        gameOverScreen.saveFinishScore(score);
+//    }
+
+    public void saveDeadHero(Hero hero) {
+        gameOverScreen.saveDeadHero(hero);
     }
 
     public void resize(int width, int height) {

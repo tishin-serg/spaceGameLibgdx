@@ -34,5 +34,6 @@ public class WorldRenderer {
         controller.getParticleController().render(batch);
         controller.getBonusController().render(batch);
         batch.end();
+        controller.getStage().draw();
     }
 }

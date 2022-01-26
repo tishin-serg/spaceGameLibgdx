@@ -5,7 +5,6 @@ import ru.tishin.starGame.game.helpers.ObjectPool;
 
 public class AsteroidController extends ObjectPool<Asteroid> {
     private GameController gameController;
-    private float timer;
 
     public AsteroidController(GameController gameController) {
         this.gameController = gameController;
@@ -36,12 +35,9 @@ public class AsteroidController extends ObjectPool<Asteroid> {
 
 
     public void update(float dt) {
-        timer += dt;
         for (int i = 0; i < activeList.size(); i++) {
             activeList.get(i).update(dt);
         }
-        // if (activeList.size() < 5) init();
-        // если появились неактивные астероиды, то переводим их в другой лист
         checkPool();
     }
 

@@ -11,6 +11,7 @@ public class ParticleController extends ObjectPool<Particle> {
 
     private TextureRegion oneParticle;
     private EffectBuilder effectBuilder;
+
     public ParticleController() {
         this.oneParticle = Assets.getInstance().getAtlas().findRegion("star16");
         this.effectBuilder = new EffectBuilder();
@@ -20,15 +21,39 @@ public class ParticleController extends ObjectPool<Particle> {
         return effectBuilder;
     }
 
-    public void takeBonusEffect(float x, float y) {
-        for (int i = 0; i < 16; i++) {
-            // равномерно распределяем круг на 16 частей
-            float angle = 6.28f / 16f * i;
-            setup(x, y, MathUtils.cos(angle) * 100, MathUtils.sin(angle) * 100,
-                    0.4f, 2f, 1f,
-                    0,1,0,1,
-                    1,1,0,0.5f);
+    public void takeBonusEffect(float x, float y, Bonus.BonusType bonusType) {
+        switch (bonusType) {
+            case COINS:
+                for (int i = 0; i < 16; i++) {
+                    // равномерно распределяем круг на 16 частей
+                    float angle = 6.28f / 16f * i;
+                    setup(x, y, MathUtils.cos(angle) * 100, MathUtils.sin(angle) * 100,
+                            0.4f, 2f, 1f,
+                            1, 1, 0, 1,
+                            1, 0.5f, 0, 0.5f);
+                }
+                break;
+            case HP:
+                for (int i = 0; i < 16; i++) {
+                    float angle = 6.28f / 16f * i;
+                    setup(x, y, MathUtils.cos(angle) * 100, MathUtils.sin(angle) * 100,
+                            0.4f, 2f, 1f,
+                            0, 1, 0, 1,
+                            1, 1, 0, 0.5f);
+                }
+                break;
+            case AMMO:
+                for (int i = 0; i < 16; i++) {
+                    float angle = 6.28f / 16f * i;
+                    setup(x, y, MathUtils.cos(angle) * 100, MathUtils.sin(angle) * 100,
+                            0.4f, 2f, 1f,
+                            1, 0, 0, 1,
+                            1, 0, 1, 0.5f);
+                }
+                break;
         }
+
+
     }
 
     public void render(SpriteBatch batch) {

@@ -1,6 +1,5 @@
 package ru.tishin.starGame.game;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -34,7 +33,7 @@ public class Bonus implements Poolable {
     public void activate(BonusType bonusType, float x, float y, int value) {
         this.bonusType = bonusType;
         position.set(x, y);
-        hitArea.set(x, y,  30f);
+        hitArea.set(x, y, 30f);
         velocity.set(MathUtils.random(-1f, 1f), MathUtils.random(-1f, 1f));
         velocity.nor().scl(50f);
         this.value = value;
@@ -45,8 +44,8 @@ public class Bonus implements Poolable {
         position.mulAdd(velocity, dt);
         hitArea.set(position.x, position.y, 30f);
         rotation += dt * 20;
-        lifeTime += dt;
-        if (lifeTime >= 7f) {
+        this.lifeTime += dt;
+        if (this.lifeTime >= 7f) {
             deactivate();
         }
     }
@@ -73,6 +72,7 @@ public class Bonus implements Poolable {
     }
 
     public void deactivate() {
+        this.lifeTime = 0f;
         active = false;
     }
 
@@ -82,8 +82,8 @@ public class Bonus implements Poolable {
 
     public enum BonusType {
         HP(0),
-        AMMO(1),
-        COINS(2);
+        COINS(1),
+        AMMO(2);
 
         private int index;
 

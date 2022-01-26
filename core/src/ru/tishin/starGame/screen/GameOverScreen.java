@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.StringBuilder;
+import ru.tishin.starGame.game.Background;
+import ru.tishin.starGame.game.Hero;
 import ru.tishin.starGame.screen.utils.Assets;
 
 public class GameOverScreen extends AbstractScreen {
@@ -18,7 +20,8 @@ public class GameOverScreen extends AbstractScreen {
     private BitmapFont font32;
     private Stage stage;
     private StringBuilder stringBuilder;
-    private int finishScore;
+    private Hero deadHero;
+    private Background background;
 
     public GameOverScreen(SpriteBatch batch) {
         super(batch);
@@ -26,6 +29,7 @@ public class GameOverScreen extends AbstractScreen {
 
     @Override
     public void show() {
+        this.background = new Background(null);
         this.stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
         this.font72 = Assets.getInstance().getAssetManager().get("fonts/font72.ttf");
         this.font32 = Assets.getInstance().getAssetManager().get("fonts/font32.ttf");
@@ -56,6 +60,7 @@ public class GameOverScreen extends AbstractScreen {
     }
 
     public void update(float dt) {
+        background.update(dt);
         stage.act(dt);
     }
 
@@ -65,15 +70,16 @@ public class GameOverScreen extends AbstractScreen {
         update(delta);
         ScreenUtils.clear(0f, 0f, 0f, 1);
         batch.begin();
+        background.render(batch);
         font72.draw(batch, "GAME OVER", 0, 600, ScreenManager.SCREEN_WIDTH, 1, false);
-        stringBuilder.append("SCORE: ").append(finishScore);
+        stringBuilder.append("SCORE: ").append(deadHero.getScore()).append("\n");
+        stringBuilder.append("COINS: ").append(deadHero.getCoins());
         font32.draw(batch, stringBuilder, 0, 500, ScreenManager.SCREEN_WIDTH, 1, false);
         batch.end();
         stage.draw();
     }
 
-
-    public void saveFinishScore(int score) {
-        this.finishScore = score;
+    public void saveDeadHero(Hero hero) {
+        this.deadHero = hero;
     }
 }
