@@ -1,0 +1,62 @@
+
+game.png
+size: 1024, 256
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+asteroid
+  rotate: false
+  xy: 364, 14
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+bullet
+  rotate: false
+  xy: 686, 176
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+powerups
+  rotate: false
+  xy: 2, 2
+  size: 360, 240
+  orig: 360, 240
+  offset: 0, 0
+  index: -1
+ship
+  rotate: false
+  xy: 446, 96
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+shortButton
+  rotate: false
+  xy: 364, 80
+  size: 80, 80
+  orig: 80, 80
+  offset: 0, 0
+  index: -1
+simpleButton
+  rotate: false
+  xy: 364, 162
+  size: 320, 80
+  orig: 320, 80
+  offset: 0, 0
+  index: -1
+smButton
+  rotate: false
+  xy: 686, 210
+  size: 120, 32
+  orig: 120, 32
+  offset: 0, 0
+  index: -1
+star16
+  rotate: false
+  xy: 808, 226
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
