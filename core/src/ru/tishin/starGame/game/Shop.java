@@ -20,6 +20,8 @@ public class Shop extends Group {
     private TextButton btnHpMax;
     private TextButton btnHp;
     private TextButton btnWeapon;
+    private TextButton btnAttract;
+
 
     public Shop(Hero hero) {
         this.hero = hero;
@@ -45,6 +47,7 @@ public class Shop extends Group {
         initBtnHpMax(textButtonStyle);
         initBtnHp(textButtonStyle);
         initBtnWeapon(textButtonStyle);
+        initBtnAttract(textButtonStyle);
 
         this.setPosition(20, 20);
         this.setVisible(false);
@@ -119,5 +122,22 @@ public class Shop extends Group {
 
         btnWeapon.setPosition(20, 100);
         this.addActor(btnWeapon);
+    }
+
+    private void initBtnAttract(TextButton.TextButtonStyle textButtonStyle) {
+        btnAttract = new TextButton("attract+", textButtonStyle);
+        btnAttract.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (hero.isMoneyEnough(Hero.Skill.ATTRACT.cost)) {
+                    if (hero.upgradeFromStore(Hero.Skill.ATTRACT)) {
+                        hero.decreaseMoney(Hero.Skill.ATTRACT.cost);
+                    }
+                }
+            }
+        });
+
+        btnAttract.setPosition(120, 300);
+        this.addActor(btnAttract);
     }
 }

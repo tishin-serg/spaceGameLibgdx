@@ -22,32 +22,32 @@ public class GameController {
     private BonusController bonusController;
     private Hero hero;
     private Vector2 tempVector;
+    private Vector2 tempVector2;
     private ParticleController particleController;
     private Stage stage;
     private boolean isPause;
+    private Level level;
 
     public GameController(SpriteBatch batch) {
         this.background = new Background(this);
         this.hero = new Hero(this);
         this.bulletController = new BulletController(this);
         this.asteroidController = new AsteroidController(this);
+        this.level = new Level(this);
         this.tempVector = new Vector2();
+        this.tempVector2 = new Vector2();
         this.particleController = new ParticleController();
         this.bonusController = new BonusController(this);
         this.isPause = false;
         this.stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
         stage.addActor(hero.getShop());
         Gdx.input.setInputProcessor(stage);
-        for (int i = 0; i < 5; i++) {
-            asteroidController.setup(MathUtils.random(0, ScreenManager.SCREEN_WIDTH),
-                    MathUtils.random(0, ScreenManager.SCREEN_HEIGHT),
-                    MathUtils.random(-200f, 200f),
-                    MathUtils.random(-200f, 200f), 1.0f);
-        }
+        level.initAsteroids();
     }
 
     public void turnPause() {
         isPause = !isPause;
+        System.out.println(asteroidController.getActiveList().size());
     }
 
     public void update(float dt) {
@@ -64,10 +64,7 @@ public class GameController {
             saveHero(hero);
             ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME_OVER);
         }
-
-
         stage.act(dt);
-
     }
 
     private void checkPressedKeys() {
@@ -107,6 +104,10 @@ public class GameController {
                 asteroid.getVelocity().mulAdd(tempVector, -hero.getHitArea().radius / sumScl * 100);
                 if (asteroid.takeDamage(2)) {
                     hero.changeScore(asteroid.getHpMax() * 50);
+                    System.out.println(asteroidController.getActiveList().size());
+                    if (asteroidController.getActiveList().size() == 1) {
+                        level.increaseLevel();
+                    }
                 }
                 hero.takeDamage(asteroid.getHpMax() / 2);
                 break;
@@ -117,6 +118,13 @@ public class GameController {
     private void checkGettingBonus(List<Bonus> bonusList) {
         for (int i = 0; i < bonusList.size(); i++) {
             Bonus bonus = bonusList.get(i);
+
+            if (hero.getAttractionArea().overlaps(bonus.getHitArea())) {
+                tempVector2.set(hero.getPosition()).sub(bonus.getPosition()).nor();
+                bonus.getPosition().mulAdd(tempVector2, 1f);
+                bonus.getVelocity().mulAdd(tempVector2, 30f);
+            }
+
             if (hero.getHitArea().overlaps(bonus.getHitArea())) {
                 hero.takeBonus(bonus);
                 particleController.takeBonusEffect(bonus.getPosition().x, bonus.getPosition().y, bonus.getBonusType());
@@ -151,6 +159,10 @@ public class GameController {
             for (int k = 0; k < 3; k++) {
                 bonusController.setup(asteroid.getPosition().x, asteroid.getPosition().y,
                         asteroid.getScale() * 0.25f);
+            }
+            System.out.println(asteroidController.getActiveList().size());
+            if (asteroidController.getActiveList().size() == 1) {
+                level.increaseLevel();
             }
         }
     }
@@ -193,6 +205,10 @@ public class GameController {
 
     public Stage getStage() {
         return stage;
+    }
+
+    public Level getLevel() {
+        return level;
     }
 
     /*public void checkSightDirection() {

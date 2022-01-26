@@ -15,7 +15,7 @@ import ru.tishin.starGame.screen.utils.Assets;
 
 public class Hero {
     public enum Skill {
-        HP_MAX(20, 10), HP(20, 10), WEAPON(100);
+        HP_MAX(20, 10), HP(20, 10), WEAPON(100), ATTRACT(100);
         int cost;
         int value;
 
@@ -48,28 +48,30 @@ public class Hero {
     private int coins;
     private Shop shop;
     private Weapon[] weapons;
+    private Circle attractionArea;
 
     public Hero(GameController gameController) {
         this.gameController = gameController;
-        this.texture = Assets.getInstance().getAtlas().findRegion("ship");
-        this.position = new Vector2(ScreenManager.SCREEN_WIDTH / 2, ScreenManager.SCREEN_HEIGHT / 2);
-        this.velocity = new Vector2(0, 0);
-        this.angle = 0.0f;
-        this.direction = new Vector2(0, 0);
-        this.hitArea = new Circle(position, 20);
-        this.hpMax = 100;
-        this.hp = hpMax;
-        this.isLive = true;
-        this.stringBuilder = new StringBuilder();
-        this.coins = 100;
-        this.shop = new Shop(this);
+        texture = Assets.getInstance().getAtlas().findRegion("ship");
+        position = new Vector2(ScreenManager.SCREEN_WIDTH / 2, ScreenManager.SCREEN_HEIGHT / 2);
+        velocity = new Vector2(0, 0);
+        angle = 0.0f;
+        direction = new Vector2(0, 0);
+        hitArea = new Circle(position, 20);
+        hpMax = 100;
+        hp = hpMax;
+        isLive = true;
+        stringBuilder = new StringBuilder();
+        coins = 100;
+        shop = new Shop(this);
         createWeapons();
-        this.weaponNum = 0;
-        this.currentWeapon = weapons[weaponNum];
+        weaponNum = 0;
+        currentWeapon = weapons[weaponNum];
+        attractionArea = new Circle(position, 0f);
     }
 
     private void createWeapons() {
-        this.weapons = new Weapon[]{
+        weapons = new Weapon[]{
                 new Weapon(gameController, this, "Laser", 0, 1, 500f, 200, 0.2f,
                         new Vector3[]{
                                 new Vector3(28, 0, 0)
@@ -138,6 +140,11 @@ public class Hero {
                     currentWeapon = weapons[weaponNum];
                     return true;
                 }
+            case ATTRACT:
+                if (attractionArea.radius < 160) {
+                    attractionArea.radius += 80;
+                    return true;
+                }
         }
         return false;
     }
@@ -153,6 +160,7 @@ public class Hero {
          */
         position.mulAdd(velocity, dt);
         hitArea.setPosition(position);
+        attractionArea.setPosition(position);
         direction.set(MathUtils.cosDeg(angle), MathUtils.sinDeg(angle));
 
         slowingDown(dt);
@@ -280,7 +288,8 @@ public class Hero {
         stringBuilder.append("SCORE: ").append(getScoreView()).append("\n");
         stringBuilder.append("HP: ").append(hp).append(" / ").append(hpMax).append("\n");
         stringBuilder.append("AMMO: ").append(currentWeapon.getBulletCountCurrent()).append(" / ").append(currentWeapon.getBulletCountMax()).append("\n");
-        stringBuilder.append("COINS: ").append(coins);
+        stringBuilder.append("COINS: ").append(coins).append("\n");
+        stringBuilder.append("LEVEL: ").append(gameController.getLevel().getCurrentLevel());
         font32.draw(batch, stringBuilder, 50, ScreenManager.SCREEN_HEIGHT - 50);
     }
 
@@ -332,5 +341,7 @@ public class Hero {
         return hitArea;
     }
 
-
+    public Circle getAttractionArea() {
+        return attractionArea;
+    }
 }

@@ -24,7 +24,6 @@ public class Asteroid implements Poolable {
     private int hpMax;
     private Circle hitArea;
 
-
     public Asteroid(GameController gameController) {
         this.texture = Assets.getInstance().getAtlas().findRegion("asteroid");
         this.gameController = gameController;
@@ -103,7 +102,7 @@ public class Asteroid implements Poolable {
         position.set(x, y);
         velocity.set(vx, vy);
         active = true;
-        hpMax = (int) (10 * scale);
+        hpMax = (int) (10 * scale * gameController.getLevel().getHardRate());
         hp = hpMax;
         angle = MathUtils.random(0f, 360f);
         rotation = MathUtils.random(-180f, 180f);

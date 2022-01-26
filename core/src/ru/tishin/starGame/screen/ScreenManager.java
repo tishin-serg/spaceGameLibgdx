@@ -50,10 +50,6 @@ public class ScreenManager {
         this.gameOverScreen = new GameOverScreen(batch);
     }
 
-//    public void saveFinishScore(int score) {
-//        gameOverScreen.saveFinishScore(score);
-//    }
-
     public void saveDeadHero(Hero hero) {
         gameOverScreen.saveDeadHero(hero);
     }
@@ -88,4 +84,5 @@ public class ScreenManager {
     public void goToTarget() {
         game.setScreen(targetScreen);
     }
+
 }

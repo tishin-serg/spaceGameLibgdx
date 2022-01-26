@@ -32,11 +32,11 @@ public class Bonus implements Poolable {
 
     public void activate(BonusType bonusType, float x, float y, int value) {
         this.bonusType = bonusType;
+        this.value = value;
         position.set(x, y);
         hitArea.set(x, y, 30f);
         velocity.set(MathUtils.random(-1f, 1f), MathUtils.random(-1f, 1f));
         velocity.nor().scl(50f);
-        this.value = value;
         active = true;
     }
 
@@ -44,8 +44,8 @@ public class Bonus implements Poolable {
         position.mulAdd(velocity, dt);
         hitArea.set(position.x, position.y, 30f);
         rotation += dt * 20;
-        this.lifeTime += dt;
-        if (this.lifeTime >= 7f) {
+        lifeTime += dt;
+        if (lifeTime >= 7f) {
             deactivate();
         }
     }
@@ -72,7 +72,7 @@ public class Bonus implements Poolable {
     }
 
     public void deactivate() {
-        this.lifeTime = 0f;
+        lifeTime = 0f;
         active = false;
     }
 
@@ -94,5 +94,9 @@ public class Bonus implements Poolable {
         public int getIndex() {
             return index;
         }
+    }
+
+    public void setVelocity(Vector2 velocity) {
+        this.velocity = velocity;
     }
 }
