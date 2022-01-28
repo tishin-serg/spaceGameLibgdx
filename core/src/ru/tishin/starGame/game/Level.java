@@ -6,12 +6,10 @@ import ru.tishin.starGame.screen.ScreenManager;
 public class Level {
     private GameController gameController;
     private int currentLevel;
-    private float hardRate;
 
     public Level(GameController gameController) {
         this.gameController = gameController;
         currentLevel = 1;
-        hardRate = currentLevel;
     }
 
     public void initAsteroids() {
@@ -25,7 +23,6 @@ public class Level {
 
     public void increaseLevel() {
         currentLevel++;
-        hardRate = currentLevel * 0.5f;
         initAsteroids();
     }
 
@@ -33,7 +30,4 @@ public class Level {
         return currentLevel;
     }
 
-    public float getHardRate() {
-        return hardRate;
-    }
 }

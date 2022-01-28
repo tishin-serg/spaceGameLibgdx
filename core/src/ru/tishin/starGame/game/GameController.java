@@ -7,10 +7,12 @@ package ru.tishin.starGame.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.StringBuilder;
 import ru.tishin.starGame.screen.ScreenManager;
 
 import java.util.List;
@@ -27,6 +29,9 @@ public class GameController {
     private Stage stage;
     private boolean isPause;
     private Level level;
+    private float timer;
+    private InfoController infoController;
+    private StringBuilder sb;
 
     public GameController(SpriteBatch batch) {
         this.background = new Background(this);
@@ -38,8 +43,10 @@ public class GameController {
         this.tempVector2 = new Vector2();
         this.particleController = new ParticleController();
         this.bonusController = new BonusController(this);
+        this.infoController = new InfoController();
         this.isPause = false;
         this.stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
+         this.sb = new StringBuilder();
         stage.addActor(hero.getShop());
         Gdx.input.setInputProcessor(stage);
         level.initAsteroids();
@@ -47,18 +54,25 @@ public class GameController {
 
     public void turnPause() {
         isPause = !isPause;
-        System.out.println(asteroidController.getActiveList().size());
+
+        if (isPause) {
+            ScreenManager.getInstance().getTargetScreen().pause();
+        } else {
+            ScreenManager.getInstance().getTargetScreen().resume();
+        }
     }
 
     public void update(float dt) {
         checkPressedKeys();
         if (isPause) return;
+        timer += dt;
         background.update(dt);
         hero.update(dt);
         asteroidController.update(dt);
         bulletController.update(dt);
         particleController.update(dt);
         bonusController.update(dt);
+        infoController.update(dt);
         checkCollisions();
         if (!hero.checkLive()) {
             saveHero(hero);
@@ -104,12 +118,15 @@ public class GameController {
                 asteroid.getVelocity().mulAdd(tempVector, -hero.getHitArea().radius / sumScl * 100);
                 if (asteroid.takeDamage(2)) {
                     hero.changeScore(asteroid.getHpMax() * 50);
-                    System.out.println(asteroidController.getActiveList().size());
                     if (asteroidController.getActiveList().size() == 1) {
                         level.increaseLevel();
+                        timer = 0f;
                     }
                 }
                 hero.takeDamage(asteroid.getHpMax() / 2);
+                sb.clear();
+                sb.append("HP -").append(asteroid.getHpMax() / 2);
+                infoController.setup(hero.position.x, hero.position.y, sb, Color.RED);
                 break;
             }
         }
@@ -121,7 +138,7 @@ public class GameController {
 
             if (hero.getAttractionArea().overlaps(bonus.getHitArea())) {
                 tempVector2.set(hero.getPosition()).sub(bonus.getPosition()).nor();
-                bonus.getPosition().mulAdd(tempVector2, 1f);
+                // bonus.getPosition().mulAdd(tempVector2, 1f);
                 bonus.getVelocity().mulAdd(tempVector2, 30f);
             }
 
@@ -160,9 +177,9 @@ public class GameController {
                 bonusController.setup(asteroid.getPosition().x, asteroid.getPosition().y,
                         asteroid.getScale() * 0.25f);
             }
-            System.out.println(asteroidController.getActiveList().size());
             if (asteroidController.getActiveList().size() == 1) {
                 level.increaseLevel();
+                timer = 0;
             }
         }
     }
@@ -209,6 +226,18 @@ public class GameController {
 
     public Level getLevel() {
         return level;
+    }
+
+    public float getTimer() {
+        return timer;
+    }
+
+    public void setTimer(float timer) {
+        this.timer = timer;
+    }
+
+    public InfoController getInfoController() {
+        return infoController;
     }
 
     /*public void checkSightDirection() {

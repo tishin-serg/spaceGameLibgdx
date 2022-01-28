@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import ru.tishin.starGame.screen.utils.Assets;
 
+//todo Доделать проверку списания денег при максимальном улучшении
+
 public class Shop extends Group {
     private final Shop thisShop = this;
     private Hero hero;
@@ -21,14 +23,14 @@ public class Shop extends Group {
     private TextButton btnHp;
     private TextButton btnWeapon;
     private TextButton btnAttract;
-
+    private Pixmap pixmap;
 
     public Shop(Hero hero) {
         this.hero = hero;
         this.font24 = Assets.getInstance().getAssetManager().get("fonts/font24.ttf");
         this.isVisible = false;
 
-        Pixmap pixmap = new Pixmap(400, 400, Pixmap.Format.RGB888);
+        pixmap = new Pixmap(400, 400, Pixmap.Format.RGB888);
         pixmap.setColor(0, 0, 0.5f, 1);
         pixmap.fill();
 
@@ -139,5 +141,9 @@ public class Shop extends Group {
 
         btnAttract.setPosition(120, 300);
         this.addActor(btnAttract);
+    }
+
+    public Pixmap getPixmap() {
+        return pixmap;
     }
 }

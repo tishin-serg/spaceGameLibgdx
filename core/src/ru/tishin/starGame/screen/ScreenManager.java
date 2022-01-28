@@ -16,6 +16,8 @@ public class ScreenManager {
 
     public static final int SCREEN_WIDTH = 1280;
     public static final int SCREEN_HEIGHT = 720;
+    public static final int SCREEN_HALF_WIDTH = 640;
+    public static final int SCREEN_HALF_HEIGHT = 360;
 
     private SpriteBatch batch;
     private StarGame game;
@@ -85,4 +87,7 @@ public class ScreenManager {
         game.setScreen(targetScreen);
     }
 
+    public Screen getTargetScreen() {
+        return targetScreen;
+    }
 }
