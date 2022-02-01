@@ -22,7 +22,7 @@ public class GameScreen extends AbstractScreen {
         this.renderer = new WorldRenderer(controller, batch);
         this.music = Assets.getInstance().getAssetManager().get("audio/mortal.mp3");
         music.setLooping(true);
-        music.play();
+        // music.play();
     }
 
     @Override

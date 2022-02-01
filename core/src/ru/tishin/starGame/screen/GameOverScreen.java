@@ -1,6 +1,7 @@
 package ru.tishin.starGame.screen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,6 +23,7 @@ public class GameOverScreen extends AbstractScreen {
     private StringBuilder stringBuilder;
     private Hero deadHero;
     private Background background;
+    private Music music;
 
     public GameOverScreen(SpriteBatch batch) {
         super(batch);
@@ -34,6 +36,7 @@ public class GameOverScreen extends AbstractScreen {
         this.font72 = Assets.getInstance().getAssetManager().get("fonts/font72.ttf");
         this.font32 = Assets.getInstance().getAssetManager().get("fonts/font32.ttf");
         this.stringBuilder = new StringBuilder();
+        this.music = Assets.getInstance().getAssetManager().get("audio/gameover.mp3");
 
         Gdx.input.setInputProcessor(stage);
 
@@ -56,6 +59,7 @@ public class GameOverScreen extends AbstractScreen {
         });
 
         stage.addActor(btnMenu);
+        music.play();
         skin.dispose();
     }
 

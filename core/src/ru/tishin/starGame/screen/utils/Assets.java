@@ -60,6 +60,7 @@ public class Assets {
                 break;
             case GAME_OVER:
                 assetManager.load("images/game.pack", TextureAtlas.class);
+                assetManager.load("audio/gameover.mp3", Music.class);
                 createStandardFont(72);
                 createStandardFont(32);
                 break;

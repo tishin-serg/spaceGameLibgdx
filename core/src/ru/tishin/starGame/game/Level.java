@@ -13,7 +13,7 @@ public class Level {
     }
 
     public void initAsteroids() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             gameController.getAsteroidController().setup(MathUtils.random(0, ScreenManager.SCREEN_WIDTH),
                     MathUtils.random(0, ScreenManager.SCREEN_HEIGHT),
                     MathUtils.random(-200f, 200f),
@@ -23,7 +23,11 @@ public class Level {
 
     public void increaseLevel() {
         currentLevel++;
-        initAsteroids();
+        gameController.getBotController().setup(MathUtils.random(0, ScreenManager.SCREEN_WIDTH),
+                MathUtils.random(0, ScreenManager.SCREEN_HEIGHT),
+                0,
+                0);
+        // initAsteroids();
     }
 
     public int getCurrentLevel() {

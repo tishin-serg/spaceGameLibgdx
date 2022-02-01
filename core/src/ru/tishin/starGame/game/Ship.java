@@ -1,6 +1,5 @@
 package ru.tishin.starGame.game;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
@@ -15,6 +14,7 @@ public class Ship {
     protected Vector2 position;
     protected Vector2 velocity;
     protected Vector2 direction;
+    protected Vector2 tempVector;
     protected float angle;
     protected Circle hitArea;
     protected int hp;
@@ -25,10 +25,10 @@ public class Ship {
     protected TextureRegion texture;
     protected float engineSpeed;
 
-    public Ship(GameController gameController, int hpMax, float engineSpeed) {
+    public Ship(GameController gameController) {
         this.gameController = gameController;
-        this.hpMax = hpMax;
-        this.engineSpeed = engineSpeed;
+        this.hpMax = 100;
+        this.engineSpeed = 130f;
         texture = Assets.getInstance().getAtlas().findRegion("ship");
         hp = hpMax;
         angle = 0.0f;
@@ -36,6 +36,7 @@ public class Ship {
         createWeapons();
         weaponNum = 0;
         currentWeapon = weapons[weaponNum];
+        tempVector = new Vector2(0, 0);
     }
 
     public void update(float dt) {
@@ -43,6 +44,7 @@ public class Ship {
         Меняем позицию корабля. Прибавляем к вектору позиции объекта вектор ускорения.
         Умножаем на скаляр (чтобы скорость не зависела от частоты фпс).
          */
+
         position.mulAdd(velocity, dt);
         hitArea.setPosition(position);
         currentWeapon.update(dt);
@@ -117,15 +119,45 @@ public class Ship {
 
     public void render(SpriteBatch spriteBatch) {
         spriteBatch.draw(texture, position.x - 32, position.y - 32, 32, 32, 64, 64,
-                1, 1, angle);
+                1, 1, direction.angleDeg());
+    }
+
+    public float angleBetween(Vector2 v1, Vector2 v2) {
+        float result = (float) Math.toDegrees(MathUtils.atan2(v2.y, v2.x) - MathUtils.atan2(v1.y, v1.x));
+        if (result < -180) {
+            result += 360;
+        } else if (result > 180) {
+            result -= 180;
+        }
+        return result;
+    }
+
+    public Vector2 getDirectionTo(Vector2 target) {
+        tempVector.set(0, 0);
+        return tempVector.set(target).sub(position).nor();
+    }
+
+    public void rotateTo(Vector2 target, float dt) {
+        getDirectionTo(target);
+        float angleBetween = angleBetween(tempVector, direction);
+        if (!MathUtils.isEqual(angleBetween, 0, 1f)) {
+            System.out.println(angleBetween);
+            if (angleBetween > 0) {
+                angle -= 10.0f * dt * 10;
+            }
+            else {
+                angle += 10.0f * dt * 10;
+            }
+            direction.rotateDeg(angle);
+        }
     }
 
     public boolean takeDamage(int amount) {
         hp -= amount;
-        return !checkLive();
+        return hp <= 0;
     }
 
-    public boolean checkLive() {
+     public boolean checkLive() {
         return hp > 0;
     }
 

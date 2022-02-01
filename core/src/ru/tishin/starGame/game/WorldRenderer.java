@@ -41,6 +41,7 @@ public class WorldRenderer {
         controller.getParticleController().render(batch);
         controller.getBonusController().render(batch);
         controller.getInfoController().render(batch, font32);
+        controller.getBotController().render(batch);
         if (controller.getTimer() < 3) {
             sb.clear();
             sb.append("Level ").append(controller.getLevel().getCurrentLevel());

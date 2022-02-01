@@ -22,6 +22,7 @@ public class GameController {
     private BulletController bulletController;
     private AsteroidController asteroidController;
     private BonusController bonusController;
+    private BotController botController;
     private Hero hero;
     private Vector2 tempVector;
     private Vector2 tempVector2;
@@ -38,6 +39,7 @@ public class GameController {
         this.hero = new Hero(this);
         this.bulletController = new BulletController(this);
         this.asteroidController = new AsteroidController(this);
+        this.botController = new BotController(this);
         this.level = new Level(this);
         this.tempVector = new Vector2();
         this.tempVector2 = new Vector2();
@@ -46,7 +48,7 @@ public class GameController {
         this.infoController = new InfoController();
         this.isPause = false;
         this.stage = new Stage(ScreenManager.getInstance().getViewport(), batch);
-         this.sb = new StringBuilder();
+        this.sb = new StringBuilder();
         stage.addActor(hero.getShop());
         Gdx.input.setInputProcessor(stage);
         level.initAsteroids();
@@ -73,6 +75,7 @@ public class GameController {
         particleController.update(dt);
         bonusController.update(dt);
         infoController.update(dt);
+        botController.update(dt);
         checkCollisions();
         if (!hero.checkLive()) {
             saveHero(hero);
@@ -95,9 +98,51 @@ public class GameController {
         List<Asteroid> asteroidList = asteroidController.getActiveList();
         List<Bonus> bonusList = bonusController.getActiveList();
         List<Bullet> bulletList = bulletController.getActiveList();
+        List<Bot> botList = botController.getActiveList();
         checkAsteroidAndShipCollisions(asteroidList);
         checkGettingBonus(bonusList);
         checkHitsAsteroid(asteroidList, bulletList);
+        checkHitsBot(botList, bulletList);
+        checkHitsHero(bulletList);
+    }
+
+    private void checkHitsHero(List<Bullet> bulletList) {
+        for (int i = 0; i < bulletList.size(); i++) {
+            Bullet bullet = bulletList.get(i);
+            if (hero.getHitArea().contains(bullet.getPosition())) {
+                particleController.setup(bullet.getPosition().x + MathUtils.random(-4, 4),
+                        bullet.getPosition().y + MathUtils.random(-4, 4),
+                        bullet.getVelocity().x * -0.3f + MathUtils.random(-30, 30),
+                        bullet.getVelocity().y * -0.3f + MathUtils.random(-30, 30),
+                        0.2f, 2.2f, 1.5f,
+                        1f, 1f, 1f, 1,
+                        0, 0, 1, 0);
+                bullet.deactivate();
+                hero.takeDamage(3);
+                break;
+            }
+        }
+    }
+
+    private void checkHitsBot(List<Bot> botList, List<Bullet> bulletList) {
+        for (int i = 0; i < botList.size(); i++) {
+            Bot bot = botList.get(i);
+            for (int j = 0; j < bulletList.size(); j++) {
+                Bullet bullet = bulletList.get(j);
+                if (bot.getHitArea().contains(bullet.getPosition())) {
+                    particleController.setup(bullet.getPosition().x + MathUtils.random(-4, 4),
+                            bullet.getPosition().y + MathUtils.random(-4, 4),
+                            bullet.getVelocity().x * -0.3f + MathUtils.random(-30, 30),
+                            bullet.getVelocity().y * -0.3f + MathUtils.random(-30, 30),
+                            0.2f, 2.2f, 1.5f,
+                            1f, 1f, 1f, 1,
+                            0, 0, 1, 0);
+                    bullet.deactivate();
+                    checkBotDestroy(bot);
+                    break;
+                }
+            }
+        }
     }
 
     private void checkAsteroidAndShipCollisions(List<Asteroid> asteroidList) {
@@ -184,6 +229,17 @@ public class GameController {
         }
     }
 
+    private void checkBotDestroy(Bot bot) {
+        if (bot.takeDamage(hero.getCurrentWeapon().getDamage())) {
+            hero.changeScore(bot.getHpMax() * 100);
+
+            if (botController.getActiveList().size() == 0) {
+//                level.increaseLevel();
+//                timer = 0;
+            }
+        }
+    }
+
     public void saveHero(Hero hero) {
         ScreenManager.getInstance().saveDeadHero(hero);
     }
@@ -232,12 +288,12 @@ public class GameController {
         return timer;
     }
 
-    public void setTimer(float timer) {
-        this.timer = timer;
-    }
-
     public InfoController getInfoController() {
         return infoController;
+    }
+
+    public BotController getBotController() {
+        return botController;
     }
 
     /*public void checkSightDirection() {

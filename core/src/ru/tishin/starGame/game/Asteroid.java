@@ -33,30 +33,6 @@ public class Asteroid implements Poolable {
         this.active = false;
     }
 
-    public Vector2 getVelocity() {
-        return velocity;
-    }
-
-    public Vector2 getPosition() {
-        return position;
-    }
-
-    public float getRotation() {
-        return rotation;
-    }
-
-    public Circle getHitArea() {
-        return hitArea;
-    }
-
-    public int getHp() {
-        return hp;
-    }
-
-    public int getHpMax() {
-        return hpMax;
-    }
-
     public void update(float dt) {
         position.mulAdd(velocity, dt); // позиция меняется в зависимости от скорости и дельты
         angle += rotation * dt;
@@ -127,5 +103,29 @@ public class Asteroid implements Poolable {
 
     public float getScale() {
         return scale;
+    }
+
+    public Vector2 getVelocity() {
+        return velocity;
+    }
+
+    public Vector2 getPosition() {
+        return position;
+    }
+
+    public float getRotation() {
+        return rotation;
+    }
+
+    public Circle getHitArea() {
+        return hitArea;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public int getHpMax() {
+        return hpMax;
     }
 }

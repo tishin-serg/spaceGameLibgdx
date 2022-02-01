@@ -20,10 +20,12 @@ public class Hero extends Ship {
     private Circle attractionArea;
 
     public Hero(GameController gameController) {
-        super(gameController, 100, 500f);
+        super(gameController);
         position = new Vector2(ScreenManager.SCREEN_WIDTH / 2, ScreenManager.SCREEN_HEIGHT / 2);
         velocity = new Vector2(0, 0);
         sb = new StringBuilder();
+        hpMax = 100;
+        engineSpeed = 500f;
         coins = 1000;
         shop = new Shop(this);
         attractionArea = new Circle(position, 0f);
@@ -91,15 +93,78 @@ public class Hero extends Ship {
         }
     }
 
+    public void rotate(float dt) {
+        angle += 180f * dt;
+    }
+
+    /*
     private void checkPressedKeys(float dt) {
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             shooting();
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             angle += 180.0f * dt;
+            direction.setAngleDeg(angle);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             angle -= 180.0f * dt;
+            direction.setAngleDeg(angle);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.F)) {
+
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            // velocity.add(MathUtils.cosDeg(angle) * SPEED * dt, MathUtils.sinDeg(angle) * SPEED * dt);
+            velocity.mulAdd(direction, SPEED * dt);
+            float bx = position.x + MathUtils.cosDeg(angle + 180) * 30;
+            float by = position.y + MathUtils.sinDeg(angle + 180) * 30;
+            for (int i = 0; i < 3; i++) {
+                gameController.getParticleController().setup(bx + MathUtils.random(-4, 4), by + MathUtils.random(-4, 4),
+                        velocity.x * -0.1f + MathUtils.random(-20, 20), velocity.y * -0.1f + MathUtils.random(-20, 20),
+                        0.3f, 1.2f, 0.2f,
+                        1.0f, 0.5f, 0, 1,
+                        1, 1, 1, 0);
+            }
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            velocity.mulAdd(direction, -SPEED / 2 * dt);
+            // velocity.add(MathUtils.cosDeg(angle) * (-SPEED / 2) * dt, MathUtils.sinDeg(angle) * (-SPEED / 2) * dt);
+            float bx = position.x + MathUtils.cosDeg(angle + 90) * -25;
+            float by = position.y + MathUtils.sinDeg(angle + 90) * -25;
+            for (int i = 0; i < 2; i++) {
+                gameController.getParticleController().setup(bx + MathUtils.random(-4, 4), by + MathUtils.random(-4, 4),
+                        velocity.x * 0.1f + MathUtils.random(-20, 20), velocity.y * 0.1f + MathUtils.random(-20, 20),
+                        0.3f, 1.2f, 0.2f,
+                        1f, 0.5f, 0f, 1f,
+                        1f, 1f, 1f, 0);
+            }
+            bx = position.x + MathUtils.cosDeg(angle - 90) * -25;
+            by = position.y + MathUtils.sinDeg(angle - 90) * -25;
+            for (int i = 0; i < 2; i++) {
+                gameController.getParticleController().setup(bx + MathUtils.random(-4, 4), by + MathUtils.random(-4, 4),
+                        velocity.x * 0.1f + MathUtils.random(-20, 20), velocity.y * 0.1f + MathUtils.random(-20, 20),
+                        0.3f, 1.2f, 0.2f,
+                        1f, 0.5f, 0f, 1f,
+                        1f, 1f, 1f, 0);
+            }
+        }
+    }
+     */
+
+
+    private void checkPressedKeys(float dt) {
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            shooting();
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            angle += 180.0f * dt;
+            direction.setAngleDeg(angle);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            angle -= 180.0f * dt;
+            direction.setAngleDeg(angle);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.F)) {
+            rotateTo(gameController.getAsteroidController().getActiveList().get(0).getPosition(), dt);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
             velocity.add(MathUtils.cosDeg(angle) * engineSpeed * dt, MathUtils.sinDeg(angle) * engineSpeed * dt);
